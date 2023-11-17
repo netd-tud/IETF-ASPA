@@ -1,14 +1,16 @@
 from enum import Enum
 from definitions import *
 
-# Optimized AS_PATH verification algorithm.
+# Optimized AS_PATH verification algorithm using zero based array
+# where the origin AS has index N - 1 and the latest AS in the AS_PATH
+# has index 0.
 # Doesn't check any hop twice.
-def verifyASPathEfficient(aspa: ASPAObject, asPath: ASPath, direction: ASPADirection) -> ASPAVerificationResult:
+def verifyASPathEfficientZeroBased(aspa: ASPAObject, asPath: ASPath, direction: ASPADirection) -> ASPAVerificationResult:
     def describe(i: int):
-        return describeAS(aspa, asPath, i, N)
+        return describeAS(aspa, asPath, N-i, N)
     
     def hop(i: int, j: int) -> Hop:
-        return hopAndLog(aspa, asPath, i, j, N)
+        return hopAndLog(aspa, asPath, N-i, N-j, N)
     
     N: int = len(asPath)
     
@@ -28,34 +30,35 @@ def verifyASPathEfficient(aspa: ASPAObject, asPath: ASPath, direction: ASPADirec
     # =====================
     
     # Find up-ramp end
-    R = 1
-    while R < N and (lastHopRight := hop(R, R + 1)) == Hop.P:
-        R += 1
+    R = N - 1
+    while R > 0 and (lastHopRight := hop(R, R - 1)) == Hop.P:
+        R -= 1
         
     log(f"UP-RAMP: ends at {describe(R)}.")
     log("............. UP done ............")
     
-    if direction == ASPADirection.UPSTREAM and R == N:
+    if direction == ASPADirection.UPSTREAM and R == 0:
         log("UP-RAMP: complete customer-provider chain, VALID upstream AS_PATH.")
         return ASPAVerificationResult.VALID
     
     foundNPFromRight: bool = False
     foundNPFromLeft: bool = False
     
-    L: int = N
+    L: int = 0
     if direction == ASPADirection.DOWNSTREAM:
         # Find down-ramp end
-        while L > R and (lastHopLeft := hop(L, L - 1)) == Hop.P:
-            L -= 1
+        while L < R and (lastHopLeft := hop(L, L + 1)) == Hop.P:
+            L += 1
             
-        assert(L >= R)
+        assert(L <= R)
         log(f"DOWN-RAMP: ends at {describe(L)}.")
         log("............. DOWN done ............")
         
         # If gap does not exist (sharp tip) or is just a single hop wide,
         # there's no way to create a route leak, return VALID.
-        if L - R <= 1:
-            log(f"GAP: gap is {L - R} wide, that's a VALID AS_PATH.")
+        # CAUTION: L is smaller than R, because the array is zero-based.
+        if R - L <= 1:
+            log(f"GAP: gap is {R - L} wide, that's a VALID AS_PATH.")
             return ASPAVerificationResult.VALID
         
     # ===========================
@@ -77,17 +80,17 @@ def verifyASPathEfficient(aspa: ASPAObject, asPath: ASPath, direction: ASPADirec
     #           /
     #   L      /\                  R
     #   * -- * -- * . . . . . * -- *
-    #  /    L-1              R+1    \
+    #  /    L+1              R-1    \
     # *       |<------------------|  *
-    # N                              1
-    RR: int = R + 1
+    # 0                             N-1
+    RR: int = R - 1
     if lastHopRight == Hop.nP:
         foundNPFromRight = True
         log(f"Found nP+ from right!")
     else:
-        while RR < L - 1:
+        while RR > L + 1:
             c = RR
-            RR += 1
+            RR -= 1
             if hop(c, RR) == Hop.nP:
                 log("Found nP+ from right!")
                 foundNPFromRight = True
@@ -115,17 +118,17 @@ def verifyASPathEfficient(aspa: ASPAObject, asPath: ASPath, direction: ASPADirec
         #                       /
         #  L    LL             /\
         #   * -- * . . . . . * -- * . . . . .
-        #  /    L-1               RR
+        #  /    L+1               RR
         # *       |------------->|
-        # N
-        LL: int = L - 1
+        # 0
+        LL: int = L + 1
         if lastHopLeft == Hop.nP:
             foundNPFromLeft = True
             log("Found nP+ from left!")
         else:
-            while LL > RR:
+            while LL < RR:
                 c = LL
-                LL -= 1
+                LL += 1
                 if hop(c, LL) == Hop.nP:
                     log("Found nP+ from left!")
                     foundNPFromLeft = True
