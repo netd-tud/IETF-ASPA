@@ -64,7 +64,7 @@ def verifyASPathEfficient(aspa: ASPAObject, asPath: ASPath, direction: ASPADirec
         
     # I. FROM RIGHT
     # --------------
-    # Check if there's a nP hop in the gap from the right (facing left).
+    # Check if there's a nP+ hop in the gap from the right (facing left).
     # a, The next hop right after the up-ramp was already retrieved from the database,
     #    so just check if that hop was nP+.
     # b, Also, don't check last hop before down-ramp starts
@@ -99,17 +99,14 @@ def verifyASPathEfficient(aspa: ASPAObject, asPath: ASPath, direction: ASPADirec
     
     # II. FROM LEFT
     # --------------
-    # Check if there's a nP hop in the gap from the right (facing left).
+    # Check if there's a nP+ hop in the gap from the right (facing left).
     if direction == ASPADirection.DOWNSTREAM and foundNPFromRight:
         # a, There's no need to check for an nP+ from the left if we 
         #    didn't find an nP+ from the right before.
         # b, The next hop right after the down-ramp was already retrieved from the database,
         #    so just check if that hop was nP+.
-        # c, Also, don't check last hop before up-ramp starts
-        #    because there must be a hop of space in order for two
-        #    nP+ hops to oppose each other.
-        # d, LL points to the right end of the hop last checked.
-        # e, Checking stops if the hop is nP+.
+        # c, LL points to the right end of the hop last checked.
+        # d, Checking stops if the hop is nP+.
         # 
         #                    Last chance of finding a relevant nP+ hop
         #                       /
@@ -134,7 +131,6 @@ def verifyASPathEfficient(aspa: ASPAObject, asPath: ASPath, direction: ASPADirec
         log(f"Stopped at {describe(LL)}")
         log("............. |----- nP+ ? ---->| done ............")
         
-    # Do not search nP+ facing left if there's no nP+ facing right anyway
     if direction == ASPADirection.DOWNSTREAM and foundNPFromLeft and foundNPFromRight:
         log("GAP: nP+ in opposing directions, INVALID AS_PATH.")
         return ASPAVerificationResult.INVALID

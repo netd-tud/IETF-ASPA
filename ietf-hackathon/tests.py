@@ -8,7 +8,7 @@ from optimizedZeroBased import *
 
 
 def testASPACase(label: str, aspa: ASPAObject, path: ASPath, direction: ASPADirection):
-    config.enableDebugLogging = False
+    config.enableDebugLogging = True
     
     log(f"========== {label} ==========")
     draftRes = verifyASPathDraft16(aspa, path, direction)
@@ -356,6 +356,26 @@ testASPACase(
     label="Ex13",
     aspa={
         60: [50],
+        50: [40, 60],
+        40: [30, 50],
+        30: [   40],
+        20: [30]
+    },
+    path=[20, 30, 40, 50, 60],
+    direction=ASPADirection.UPSTREAM,
+)
+
+#   20
+#       30
+#           40 
+#               50
+#                    60
+# Example 14 (invalid)
+
+testASPACase(
+    label="Ex14",
+    aspa={
+        60: [50, 20],
         50: [40, 60],
         40: [30, 50],
         30: [   40],
