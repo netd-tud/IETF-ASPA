@@ -2,13 +2,14 @@ from enum import Enum
 import config
 from definitions import *
 from simplified import *
+from simplified2 import *
 from draft import *
 from optimized import *
 from optimizedZeroBased import *
 
 
 def testASPACase(label: str, aspa: ASPAObject, path: ASPath, direction: ASPADirection):
-    config.enableDebugLogging = True
+    config.enableDebugLogging = False
     
     log(f"========== {label} ==========")
     draftRes = verifyASPathDraft16(aspa, path, direction)
@@ -25,23 +26,31 @@ def testASPACase(label: str, aspa: ASPAObject, path: ASPath, direction: ASPADire
     log("\nApplying simplified algo...")
     simpleRes = verifyASPathSimplified(aspa, path, direction)
     log(f"Returned {simpleRes.name}")
+    
+    log("\nApplying simplified2 algo...")
+    simple2Res = verifyASPathSimplified2(aspa, path, direction)
+    log(f"Returned {simple2Res.name}")
 
     print(f"\n{label}:")
     print(f"\t - draft-16 \t: {draftRes.name}")
     print(f"\t - optimized \t: {optRes.name}")
     print(f"\t - optimized0 \t: {optRes0.name}")
     print(f"\t - simplified \t: {simpleRes.name}")
+    print(f"\t - simplified2 \t: {simple2Res.name}")
+#   print(f"\t - understa. \t: {undRes.name}")
     log("\n\n")
     
     if optRes != draftRes:
-        raise ValueError(f"{label}: Expected {draftRes.name}, but result was {optRes.name}.")
+        raise ValueError(f"{label}: optimized -- Expected {draftRes.name}, but result was {optRes.name}.")
         
     if optRes0 != draftRes:
-        raise ValueError(f"{label}: Expected {draftRes.name}, but result was {optRes0.name}.")
+        raise ValueError(f"{label}: optimized0 -- Expected {draftRes.name}, but result was {optRes0.name}.")
         
     if simpleRes != draftRes:
-        raise ValueError(f"{label}: Expected {draftRes.name}, but result was {simpleRes.name}.")
+        raise ValueError(f"{label}: simplified -- Expected {draftRes.name}, but result was {simpleRes.name}.")
     
+    if simple2Res != draftRes:
+        raise ValueError(f"{label}: simplified2 -- Expected {draftRes.name}, but result was {simple2Res.name}.")
 
 
 # == EXAMPLES ==
