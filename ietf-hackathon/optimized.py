@@ -4,7 +4,7 @@ from definitions import *
 
 # Optimized AS_PATH verification algorithm.
 # Doesn't check any hop twice.
-def verifyASPathEfficient(aspa: ASPAObject, asPath: ASPath, direction: ASPADirection) -> ASPAVerificationResult:
+def verifyASPathOptimized(aspa: ASPAObject, asPath: ASPath, direction: ASPADirection) -> ASPAVerificationResult:
     def describe(i: int):
         return describeAS(aspa, asPath, i, N)
 
@@ -81,12 +81,12 @@ def verifyASPathEfficient(aspa: ASPAObject, asPath: ASPath, direction: ASPADirec
     #  /    L-1              R+1    \
     # *       |<------------------|  *
     # N                              1
-    RR: int = R + 1
+    RR: int = R
     if lastHopRight == Hop.nP:
         foundNPFromRight = True
         log(f"Found nP+ from right!")
     else:
-        while RR < L - 1:
+        while RR < (L - 1 if direction == ASPADirection.DOWNSTREAM else N):
             c = RR
             RR += 1
             if hop(c, RR) == Hop.nP:

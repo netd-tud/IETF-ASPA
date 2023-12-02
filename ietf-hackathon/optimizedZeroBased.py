@@ -6,7 +6,7 @@ from definitions import *
 # where the origin AS has index N - 1 and the latest AS in the AS_PATH
 # has index 0.
 # Doesn't check any hop twice.
-def verifyASPathEfficientZeroBased(
+def verifyASPathOptimizedZeroBased(
     aspa: ASPAObject, asPath: ASPath, direction: ASPADirection
 ) -> ASPAVerificationResult:
     def describe(i: int):
@@ -86,12 +86,12 @@ def verifyASPathEfficientZeroBased(
     #  /    L+1              R-1    \
     # *       |<------------------|  *
     # 0                             N-1
-    RR: int = R - 1
+    RR: int = R
     if lastHopRight == Hop.nP:
         foundNPFromRight = True
         log(f"Found nP+ from right!")
     else:
-        while RR > L + 1:
+        while RR > (L + 1 if direction == ASPADirection.DOWNSTREAM else 0):
             c = RR
             RR -= 1
             if hop(c, RR) == Hop.nP:

@@ -16,11 +16,11 @@ def testASPACase(label: str, aspa: ASPAObject, path: ASPath, direction: ASPADire
     log(f"Returned {draftRes.name}")
 
     log("\nApplying optimized algo...")
-    optRes = verifyASPathEfficient(aspa, path, direction)
+    optRes = verifyASPathOptimized(aspa, path, direction)
     log(f"Returned {optRes.name}")
 
     log("\nApplying optimized zero-based algo...")
-    optRes0 = verifyASPathEfficientZeroBased(aspa, path, direction)
+    optRes0 = verifyASPathOptimizedZeroBased(aspa, path, direction)
     log(f"Returned {optRes0.name}")
 
     log("\nApplying simplified algo...")
@@ -344,7 +344,7 @@ testASPACase(
 #           40
 #               50
 #                    60
-# Example 14 (invalid)
+# Example 15 (invalid)
 
 testASPACase(
     label="Ex15",
@@ -354,11 +354,12 @@ testASPACase(
 )
 
 
-#
-#                 X
-#     20      40
-# 10      30
-# Example 14 (invalid)
+
+#     20   30   40
+# 10
+# 
+# 
+# Example 16 (invalid)
 
 testASPACase(
     label="Ex16",
@@ -375,7 +376,7 @@ testASPACase(
 #                 X
 #     20      40
 # 10      30
-# Example 14 (invalid)
+# Example 17 (invalid)
 
 testASPACase(
     label="Ex17",
