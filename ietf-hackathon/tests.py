@@ -10,23 +10,23 @@ from optimizedZeroBased import *
 
 def testASPACase(label: str, aspa: ASPAObject, path: ASPath, direction: ASPADirection):
     config.enableDebugLogging = False
-    
+
     log(f"========== {label} ==========")
     draftRes = verifyASPathDraft16(aspa, path, direction)
     log(f"Returned {draftRes.name}")
-    
+
     log("\nApplying optimized algo...")
     optRes = verifyASPathEfficient(aspa, path, direction)
     log(f"Returned {optRes.name}")
-    
+
     log("\nApplying optimized zero-based algo...")
     optRes0 = verifyASPathEfficientZeroBased(aspa, path, direction)
     log(f"Returned {optRes0.name}")
-    
+
     log("\nApplying simplified algo...")
     simpleRes = verifyASPathSimplified(aspa, path, direction)
     log(f"Returned {simpleRes.name}")
-    
+
     log("\nApplying simplified2 algo...")
     simple2Res = verifyASPathSimplified2(aspa, path, direction)
     log(f"Returned {simple2Res.name}")
@@ -37,30 +37,30 @@ def testASPACase(label: str, aspa: ASPAObject, path: ASPath, direction: ASPADire
     print(f"\t - optimized0 \t: {optRes0.name}")
     print(f"\t - simplified \t: {simpleRes.name}")
     print(f"\t - simplified2 \t: {simple2Res.name}")
-#   print(f"\t - understa. \t: {undRes.name}")
+    #   print(f"\t - understa. \t: {undRes.name}")
     log("\n\n")
-    
+
     if optRes != draftRes:
         raise ValueError(f"{label}: optimized -- Expected {draftRes.name}, but result was {optRes.name}.")
-        
+
     if optRes0 != draftRes:
         raise ValueError(f"{label}: optimized0 -- Expected {draftRes.name}, but result was {optRes0.name}.")
-        
+
     if simpleRes != draftRes:
         raise ValueError(f"{label}: simplified -- Expected {draftRes.name}, but result was {simpleRes.name}.")
-    
+
     if simple2Res != draftRes:
         raise ValueError(f"{label}: simplified2 -- Expected {draftRes.name}, but result was {simple2Res.name}.")
 
 
 # == EXAMPLES ==
 # Verifying AS has ASN 10
-    
+
 # Example_1 (Valid)
 #          30   40
 #      20           70
 #  10                   80 (origin)
-    
+
 testASPACase(
     label="Ex1",
     aspa={
@@ -147,13 +147,7 @@ testASPACase(
 
 testASPACase(
     label="Ex3c",
-    aspa={
-        80: [70],
-        70: [40],
-        20: [30],
-        30: [],
-        40: []
-    },
+    aspa={80: [70], 70: [40], 20: [30], 30: [], 40: []},
     path=[20, 30, 90, 100, 40, 70, 80],
     direction=ASPADirection.DOWNSTREAM,
 )
@@ -165,13 +159,7 @@ testASPACase(
 
 testASPACase(
     label="Ex3d",
-    aspa={
-        80: [70],
-        70: [40],
-        20: [30],
-        30: [],
-        90: []
-    },
+    aspa={80: [70], 70: [40], 20: [30], 30: [], 90: []},
     path=[20, 30, 90, 100, 40, 70, 80],
     direction=ASPADirection.DOWNSTREAM,
 )
@@ -183,13 +171,7 @@ testASPACase(
 
 testASPACase(
     label="Ex3f",
-    aspa={
-        80: [70],
-        70: [40],
-        20: [30],
-        100: [],
-        90: []
-    },
+    aspa={80: [70], 70: [40], 20: [30], 100: [], 90: []},
     path=[20, 30, 90, 100, 40, 70, 80],
     direction=ASPADirection.DOWNSTREAM,
 )
@@ -200,9 +182,7 @@ testASPACase(
 
 testASPACase(
     label="Ex4",
-    aspa={
-        70: [80]
-    },
+    aspa={70: [80]},
     path=[100, 30, 40, 50, 60, 70, 80],
     direction=ASPADirection.UPSTREAM,
 )
@@ -249,9 +229,9 @@ testASPACase(
 testASPACase(
     label="Ex6",
     aspa={
-        120:  [110],
-        110:  [100],
-        100:  [90],
+        120: [110],
+        110: [100],
+        100: [90],
         80: [90],
         60: [50],
         40: [50],
@@ -317,10 +297,7 @@ testASPACase(
 
 testASPACase(
     label="Ex11",
-    aspa={
-        20: [],
-        30: []
-    },
+    aspa={20: [], 30: []},
     path=[20, 30],
     direction=ASPADirection.DOWNSTREAM,
 )
@@ -343,53 +320,66 @@ testASPACase(
 
 testASPACase(
     label="Ex13",
-    aspa={
-        60: [50],
-        50: [],
-        40: [30],
-        30: [20],
-        20: []
-    },
+    aspa={60: [50], 50: [], 40: [30], 30: [20], 20: []},
     path=[20, 30, 40, 50, 60],
     direction=ASPADirection.UPSTREAM,
 )
 
 #   20
 #       30
-#           40 
-#               50
-#                    60
-# Example 14 (invalid)
-
-testASPACase(
-    label="Ex13",
-    aspa={
-        60: [50],
-        50: [40, 60],
-        40: [30, 50],
-        30: [   40],
-        20: [30]
-    },
-    path=[20, 30, 40, 50, 60],
-    direction=ASPADirection.UPSTREAM,
-)
-
-#   20
-#       30
-#           40 
+#           40
 #               50
 #                    60
 # Example 14 (invalid)
 
 testASPACase(
     label="Ex14",
-    aspa={
-        60: [50, 20],
-        50: [40, 60],
-        40: [30, 50],
-        30: [   40],
-        20: [30]
-    },
+    aspa={60: [50], 50: [40, 60], 40: [30, 50], 30: [40], 20: [30]},
     path=[20, 30, 40, 50, 60],
+    direction=ASPADirection.UPSTREAM,
+)
+
+#   20
+#       30
+#           40
+#               50
+#                    60
+# Example 14 (invalid)
+
+testASPACase(
+    label="Ex15",
+    aspa={60: [50, 20], 50: [40, 60], 40: [30, 50], 30: [40], 20: [30]},
+    path=[20, 30, 40, 50, 60],
+    direction=ASPADirection.UPSTREAM,
+)
+
+
+#
+#                 X
+#     20      40
+# 10      30
+# Example 14 (invalid)
+
+testASPACase(
+    label="Ex16",
+    aspa={
+        10: [20],
+        20: [100],
+        40: [30],
+    },
+    path=[10, 20, 30, 40],
+    direction=ASPADirection.UPSTREAM,
+)
+
+#
+#                 X
+#     20      40
+# 10      30
+# Example 14 (invalid)
+
+testASPACase(
+    label="Ex17",
+    aspa={10: [20], 20: [100], 40: [30, 50], 50: [40]},
+    path=[10, 20, 30, 40],
     direction=ASPADirection.UPSTREAM,
 )
