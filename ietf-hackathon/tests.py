@@ -7,51 +7,45 @@ from draft import *
 from optimized import *
 from optimizedZeroBased import *
 
+REFERENCE_IMPL_ID = "draft-16"
+REFERENCE_IMPL = verifyASPathDraft16
 
 def testASPACase(label: str, aspa: ASPAObject, path: ASPath, direction: ASPADirection):
     config.enableDebugLogging = False
 
+    impls = {
+        REFERENCE_IMPL_ID: REFERENCE_IMPL,
+        "optimized": verifyASPathOptimized,
+        "optimized0": verifyASPathOptimizedZeroBased,
+        "simplified": verifyASPathSimplified,
+        "simplified2": verifyASPathSimplified2
+    }
+
+    results = {}
+
     log(f"========== {label} ==========")
-    draftRes = verifyASPathDraft16(aspa, path, direction)
-    log(f"Returned {draftRes.name}")
 
-    log("\nApplying optimized algo...")
-    optRes = verifyASPathOptimized(aspa, path, direction)
-    log(f"Returned {optRes.name}")
+    for (implID, impl) in impls.items():
+        log(f"==== Running '{implID}' impl... ====")
+        results[implID] = impl(aspa, path, direction)
+        log(f"Returned {results[implID].name}\n")
 
-    log("\nApplying optimized zero-based algo...")
-    optRes0 = verifyASPathOptimizedZeroBased(aspa, path, direction)
-    log(f"Returned {optRes0.name}")
+    print(f"\n'{label}':")
 
-    log("\nApplying simplified algo...")
-    simpleRes = verifyASPathSimplified(aspa, path, direction)
-    log(f"Returned {simpleRes.name}")
+    # Print each implementation's result before checking if the result
+    # doesn't match the reference impl's return value.
+    for (implID, result) in results.items():
+        print(f"\t - {implID} \t: {result.name}")
 
-    log("\nApplying simplified2 algo...")
-    simple2Res = verifyASPathSimplified2(aspa, path, direction)
-    log(f"Returned {simple2Res.name}")
-
-    print(f"\n{label}:")
-    print(f"\t - draft-16 \t: {draftRes.name}")
-    print(f"\t - optimized \t: {optRes.name}")
-    print(f"\t - optimized0 \t: {optRes0.name}")
-    print(f"\t - simplified \t: {simpleRes.name}")
-    print(f"\t - simplified2 \t: {simple2Res.name}")
-    #   print(f"\t - understa. \t: {undRes.name}")
     log("\n\n")
 
-    if optRes != draftRes:
-        raise ValueError(f"{label}: optimized -- Expected {draftRes.name}, but result was {optRes.name}.")
+    # Compare results to reference value
+    for (implID, result) in results.items():
+        if implID == REFERENCE_IMPL_ID:
+            continue
 
-    if optRes0 != draftRes:
-        raise ValueError(f"{label}: optimized0 -- Expected {draftRes.name}, but result was {optRes0.name}.")
-
-    if simpleRes != draftRes:
-        raise ValueError(f"{label}: simplified -- Expected {draftRes.name}, but result was {simpleRes.name}.")
-
-    if simple2Res != draftRes:
-        raise ValueError(f"{label}: simplified2 -- Expected {draftRes.name}, but result was {simple2Res.name}.")
-
+        if result != results[REFERENCE_IMPL_ID]:
+            raise ValueError(f"{label}: {implID} -- Expected {results[REFERENCE_IMPL_ID].name}, but result was {result.name}.")
 
 # == EXAMPLES ==
 # Verifying AS has ASN 10
