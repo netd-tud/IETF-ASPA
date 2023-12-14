@@ -50,10 +50,10 @@ def testASPACase(label: str, aspa: ASPAObject, path: ASPath, direction: ASPADire
 # == EXAMPLES ==
 # Verifying AS has ASN 10
 
-# Example_1 (Valid)
+# Example 1 (valid)
 #          30   40
-#      20           70
-#  10                   80 (origin)
+#  10  20           70
+#                       80 (origin)
 
 testASPACase(
     label="Ex1",
@@ -66,10 +66,10 @@ testASPACase(
     direction=ASPADirection.DOWNSTREAM,
 )
 
-# Example 2  (Invalid)
+# Example 2 (unknown)
 #          30       40
-#      20       90      70
-#  10                       80 (origin)
+#  10   20       90      70
+#                           80 (origin)
 
 testASPACase(
     label="Ex2",
@@ -83,10 +83,10 @@ testASPACase(
     direction=ASPADirection.DOWNSTREAM,
 )
 
-# Example 2b  (Invalid)
-#          30       40
-#      20       90      70
-#  10                       80 (origin)
+# Example 2b (invalid)
+#          30*      40*
+#  10  20       90      70
+#                           80 (origin)
 
 testASPACase(
     label="Ex2b",
@@ -102,7 +102,7 @@ testASPACase(
     direction=ASPADirection.DOWNSTREAM,
 )
 
-# Example 3a (Unkown)
+# Example 3a (unknown)
 #          30   90  40
 #      20               70
 #  10                       80 (origin)
@@ -118,10 +118,10 @@ testASPACase(
     direction=ASPADirection.DOWNSTREAM,
 )
 
-# Example 3b (Unkown)
+# Example 3b (unknown)
 #          30   90  100 40
-#      20                 70
-#  10                         80 (origin)
+#  10  20                 70
+#                            80 (origin)
 
 testASPACase(
     label="Ex3b",
@@ -135,9 +135,9 @@ testASPACase(
 )
 
 # Example 3c (Invalid)
-#          30   90  100 40
-#      20                 70
-#  10                         80 (origin)
+#       30*  90  100  40*
+#     20                 70
+#  10                      80 (origin)
 
 testASPACase(
     label="Ex3c",
@@ -146,62 +146,61 @@ testASPACase(
     direction=ASPADirection.DOWNSTREAM,
 )
 
-# Example 3d (??)
-#          30   90  100 40
-#      20                 70
-#  10                         80 (origin)
+# Example 3d (unknown)
+#         30*  40* 100? 90?
+#  10  20                  70
+#                            80 (origin)
 
 testASPACase(
     label="Ex3d",
-    aspa={80: [70], 70: [40], 20: [30], 30: [], 90: []},
-    path=[20, 30, 90, 100, 40, 70, 80],
+    aspa={80: [70], 70: [90], 20: [30], 30: [], 40: []},
+    path=[20, 30, 40, 100, 90, 70, 80],
     direction=ASPADirection.DOWNSTREAM,
 )
 
-# Example 3f (??)
-#          30   90  100 40
-#      20                 70
-#  10                         80 (origin)
+# Example 3f (unknown)
+#          30   40  100 90
+#  10  20                 70
+#                            80 (origin)
 
 testASPACase(
     label="Ex3f",
-    aspa={80: [70], 70: [40], 20: [30], 100: [], 90: []},
-    path=[20, 30, 90, 100, 40, 70, 80],
+    aspa={80: [70], 70: [90], 20: [30], 100: [], 40: []},
+    path=[20, 30, 40, 100, 90, 70, 80],
     direction=ASPADirection.DOWNSTREAM,
 )
 
-# Example 4 (Invalid)
+# Example 4 (invalid)
 #  10                               80 (origin)
-#    100   30    40     50    60 70
+#    20   30    40    50   60   70
 
 testASPACase(
     label="Ex4",
     aspa={70: [80]},
-    path=[100, 30, 40, 50, 60, 70, 80],
+    path=[20, 30, 40, 50, 60, 70, 80],
     direction=ASPADirection.UPSTREAM,
 )
 
-# Example 4 (Invalid)
-#  10                            80 (origin)
-#    100                      70
-#      30    40     50    60
+# Example 4 (invalid)
+#  10                      80 (origin)
+#    20                70
+#      30  40  50  60
 
 testASPACase(
     label="Ex4-fixed",
     aspa={
         70: [80],
         60: [70],
-        30: [100],
+        30: [20],
     },
-    path=[100, 30, 40, 50, 60, 70, 80],
+    path=[20, 30, 40, 50, 60, 70, 80],
     direction=ASPADirection.UPSTREAM,
 )
 
-# Example 5 (Valid)
-# 10
-#   20
-#      30
-#         40 (origin)
+# Example 5 (valid)
+# 10  20
+#        30
+#           40 (origin)
 
 testASPACase(
     label="Ex5",
@@ -213,11 +212,11 @@ testASPACase(
     direction=ASPADirection.UPSTREAM,
 )
 
-# Example 6 (Invalid)
+# Example 6 (invalid)
 #         50         90
-#       40  60 70 80    100
-#     30                    110
-#   20                          120
+#       40  60 70 80   100
+#     30                  110
+#   20                       120
 # 10
 
 testASPACase(
@@ -236,14 +235,15 @@ testASPACase(
     direction=ASPADirection.DOWNSTREAM,
 )
 
-# Example 7 (Invalid)
-# Read From Right: 100 -> U -> 90 -> U -> 80 -> U -> 70 -> U -> 60 -> U -> 50
-# Read from Left: 50 -> U -> 60 -> U -> 70 -> U -> 80 -> P+ -> 90 -> P+ -> 100
-#                         100
-#                      90     110
-#         50 60 70 80             120
-#       40                           130
-#     30                                140
+# Example 7 (unknown)
+# read from right: 100 -U-> 90 -U-> 80 -U-> 70 -U-> 60 -U-> 50
+# read from left: 50 -U-> 60 -U-> 70 -U-> 80 -P+-> 90 -P+-> 100
+#
+#                        100
+#                     90     110
+#         50 60 70 80           120
+#       40                         130
+#     30                              140
 #   20
 # 10
 
@@ -264,9 +264,9 @@ testASPACase(
     direction=ASPADirection.DOWNSTREAM,
 )
 
+# Example 8 (trivially valid)
 #   20
 # 10
-# Example 8 (trivially valid)
 
 testASPACase(
     label="Ex8",
@@ -275,9 +275,9 @@ testASPACase(
     direction=ASPADirection.DOWNSTREAM,
 )
 
+# Example 9 (trivially valid)
 # 10
 #   20
-# Example 9 (trivially valid)
 
 testASPACase(
     label="Ex9",
@@ -286,8 +286,8 @@ testASPACase(
     direction=ASPADirection.UPSTREAM,
 )
 
-#   20 30
 # Example 11 (trivially valid)
+#   20 30
 
 testASPACase(
     label="Ex11",
@@ -296,8 +296,8 @@ testASPACase(
     direction=ASPADirection.DOWNSTREAM,
 )
 
-#   20 30
 # Example 12 (Unknown)
+#   20 30
 
 testASPACase(
     label="Ex12",
@@ -306,11 +306,11 @@ testASPACase(
     direction=ASPADirection.UPSTREAM,
 )
 
-#   20
-#       30
-#           40 <-| 50
-#                    60
 # Example 13 (invalid)
+#   20
+#      30
+#         40  50
+#               60
 
 testASPACase(
     label="Ex13",
@@ -319,12 +319,9 @@ testASPACase(
     direction=ASPADirection.UPSTREAM,
 )
 
-#   20
-#       30
-#           40
-#               50
-#                    60
 # Example 14 (invalid)
+#     30 <> 40 <> 50 <> 60
+#  20         
 
 testASPACase(
     label="Ex14",
@@ -333,12 +330,9 @@ testASPACase(
     direction=ASPADirection.UPSTREAM,
 )
 
-#   20
-#       30
-#           40
-#               50
-#                    60
 # Example 15 (invalid)
+#       30 <> 40 <> 50 <> 60
+#   20
 
 testASPACase(
     label="Ex15",
@@ -349,11 +343,9 @@ testASPACase(
 
 
 
-#     20   30   40
-# 10
-# 
-# 
 # Example 16 (invalid)
+#     20   30
+# 10           40
 
 testASPACase(
     label="Ex16",
@@ -366,15 +358,24 @@ testASPACase(
     direction=ASPADirection.UPSTREAM,
 )
 
-#
+# Example 17 (invalid)
 #                 X
 #     20      40
 # 10      30
-# Example 17 (invalid)
 
 testASPACase(
     label="Ex17",
     aspa={10: [20], 20: [100], 40: [30, 50], 50: [40]},
     path=[10, 20, 30, 40],
+    direction=ASPADirection.UPSTREAM,
+)
+
+# Example 18 (invalid)
+#  30  20*  40
+
+testASPACase(
+    label="Ex18",
+    aspa= { 20: [] },
+    path = [30, 20, 40],
     direction=ASPADirection.UPSTREAM,
 )
