@@ -133,8 +133,8 @@
         These new ASPA-based procedures automatically detect such anomalous AS_PATHs in announcements that are advertised between AS.
       </t>
       <t>
-        ASPA objects are cryptographically signed registrations of customer-to-provider relationships and stored in a distributed database <xref target="I-D.ietf-sidrops-aspa-profile"/>.
-        ASPA-based path verification is an incrementally deployable technique and provides benefits to early adopters in the context of limited deployment.
+          ASPA objects are cryptographically signed registrations of customer-to-provider relationships and stored in a distributed database <xref target="I-D.ietf-sidrops-aspa-profile"/>.
+          ASPA-based path verification is an incrementally deployable technique and provides benefits to adopters also in a limited deployment.
       </t>
       <t>
         The verification procedures described in this document MUST be applied to BGP routes only with {AFI, SAFI} combinations {AFI 1 (IPv4), SAFI 1} and {AFI 2 (IPv6), SAFI 1} [IANA-AF].
@@ -146,9 +146,6 @@
         Both route leaks and hijacks have similar effects on ISP operations - they redirect traffic and can result in denial of service (DoS), eavesdropping, increased latency, and packet loss.
         The level of risk, however, depends significantly on the extent of propagation of the anomalies.
         For example, a route leak or hijack that is propagated only to customers may cause bottlenecking within a particular ISP's customer cone, but if the anomaly propagates through lateral (i.e., non-transit) peers and transit providers, or reaches global distribution through transit-free networks, then the ill effects will likely be amplified and experienced across continents.
-      </t>
-      <t>
-        The ability to constrain the propagation of BGP anomalies to transit providers and lateral peers - without requiring support from the source of the anomaly (which is critical if the source has malicious intent) - should significantly improve the robustness of the global inter-domain routing system.
       </t>
     </section>
     <section title="Requirements Language" anchor="req">
@@ -164,7 +161,7 @@
 
     <section title="Terminology" anchor="terminology">
        <t>
-         The following terms are used with special meanings.
+         The following terms are used with special meaning.
        </t>
        <t>
          <list style="hanging">
@@ -212,20 +209,17 @@
      </t>
   </section>
 
-    <section title="Autonomous System Provider Authorization" anchor="ASPA">
+    <section title="Autonomous System Provider Authorization Record" anchor="ASPA">
       <t>
         An ASPA record is a digitally signed object that binds a set of Provider AS numbers to a Customer AS (CAS) number (in terms of BGP announcements) and is signed by the CAS <xref target="I-D.ietf-sidrops-aspa-profile"/>.
         The ASPA attests that the CAS indicated a Set of Provider ASes (SPAS), which applies only to the IPv4 and IPv6 address families (i.e., AFI = 1 and AFI = 2) and only to Network Layer Reachability Information used for unicast forwarding (SAFI = 1).
         The definition of Provider AS is given in Section 1 of the ASPA profile object document <xref target="I-D.ietf-sidrops-aspa-profile"/>.
-        A function of a Provider AS is to propagate a CAS's route announcements onward, i.e., to the Provider's upstream providers, lateral peers, or customers.
-        Another function is to offer outbound (customer to Internet) data traffic connectivity to the CAS.
       </t>
       <t>
         The notation (AS x, {AS y1, AS y2, ...}), is used to represent an ASPA object for a CAS denoted as AS x.
         In this notation, the set {AS y1, AS y2, ...} represents the Set of Provider ASes (SPAS) of the CAS (AS x).
-        A CAS is expected to register a single ASPA listing all its Provider ASes (see <xref target="rec1"/>).
-        If a CAS has a single ASPA, then the SPAS for the CAS is the set of Provider ASes listed in that ASPA.
-        In case a CAS has multiple ASPAs, then the SPAS is the union of the Provider ASes listed in all ASPAs of the CAS.
+        A CAS is expected to register a single ASPA listing all its Provider ASes (see <xref target="rec1"/>), if 
+        a CAS has multiple ASPAs then the union of all Provider ASes is taken.
       </t>
       <t>
         Validated ASPA Payload (VAP) refers to the payload in a cryptographically verified (i.e., X.509 valid <xref target="RFC3779"/> <xref target="RFC5280"/>) ASPA object.
@@ -235,23 +229,12 @@
 
     <section title="ASPA Registration Recommendations" anchor="rec1">
       <t>
-        An ASPA object showing only AS 0 as a provider AS is referred to as an AS0 ASPA.
-        A non-transparent Route Server AS (RS AS) is one that includes its AS number in the AS_PATH.
-        Registering as AS0 ASPA is a statement by the registering AS that it has no transit providers, and it is also not an RS-client at a non-transparent RS AS.
-        If that statement is true, then the AS MUST register an AS 0 ASPA.
+        An ASPA object that only shows AS 0 as provider AS is called AS0 ASPA. It MUST
+        be registered if the CAS is a non-transparent Route Server AS (RS AS) without a transit provider.
       </t>
       <t>
-        Normally, the Provider ASes of a CAS would be congruent for the address family combinations {AFI 1 (IPv4), SAFI 1} and {AFI 2 (IPv6), SAFI 1}.
-        Exceptions to this are expected to be rare.
-        In any case, the CAS MUST list the union of all Provider ASes applicable to the address family combinations stated above in the SPAS and MUST also include any non-transparent RS AS(es) at which it is an RS-client.
-        In the procedures for the AS path verification described in this document (<xref target="pair-validation"/>, <xref target="verif"/>), the SPAS is always considered to be uniformly applicable to {AFI 1 (IPv4), SAFI 1} and {AFI 2 (IPv6), SAFI 1}.
-      </t>
-      <t>
-        A compliant AS, including a Route Server AS (RS AS), MUST have an ASPA.
-        An RS AS SHOULD register an AS 0 ASPA.
-        An AS SHOULD NOT have more than one ASPA.
-        Such a practice helps prevent race conditions during ASPA updates that might affect prefix propagation.
-        The software that provides hosting for ASPA records SHOULD support enforcement of this practice.
+        ASPA objects are not AFI sensitive, hence all providers independent of AFI MUST be listed. Every AS SHOULD at most
+        have one ASPA object. The software that provides hosting for ASPA records SHOULD support enforcement of this practice.
         During a transition process between different certificate authority (CA) registries, the ASPA records SHOULD be kept identical in all relevant registries.
       </t>
       <t>
@@ -360,20 +343,38 @@ authorized(AS x, AS y) =  / Else, "Provider+" if the VAP-SPAS entry
         A valid path may have a one horizontal hop that represents peering relation.
       </t>
       <t>
-        <strong>Determination of Invalid AS_PATH:</strong>
+        <strong>Determining the AS_PATH Validity</strong>
       </t>
       <t>
-        If the sum of lengths of up-ramp and down-ramp is less than N, it is Invalid.
+        With ASPA we cant measure exact length of the ramps, because of potentially missing ASPA objects, but we can measure its minimum and maximum boundaries.
       </t>
+        <figure anchor="fig3" align="left" suppress-title="false" pn="figure-3">
+          <name slugifiedName="index-illustration">Illustration of an 'Invalid' AS_PATH with annotated indices</name>
+          <artwork align="left" name="" type="" alt="">
+            <![CDATA[
+                                AS_PATH
+
+             not Attested                       not Attested
+            /                                               \
+           /          not Provider+   not Provider+          \
+ N         |         /                             \         |         0
+ |         |         |                             |         |         |
+ |---------|---------|-----------------------------|---------|---------|
+ |    min_down_ramp                                     min_up_ramp    |
+                max_down_ramp                 max_up_ramp             
+
+]]>
+          </artwork>
+        </figure>
 
       <t>
-        With ASPA we can't measure exact length of the ramps, but we can measure it's minimum and maximum boundaries.
+        The min_up_ramp and min_down_ramp indicate the first occurrence of a missing ASPA object. In contrast, max_up_ramp and max_down_ramp indicate that the next AS is not contained in the SPAS. Therefore, the edge is 'Not Provider+'.
+      </t >
+      <t>
+        The maximum up-ramp length can be defined as I, where I is the minimum index for which authorized(A(I), A(I+1)) returns 'Not Provider+'. If there is no such I, the maximum is equal to AS_PATH length, or N. We define this parameter as max_up_ramp. The minimum up-ramp length can be defined as I, where I is minimum index for which authorized(A(I), A(I+1)) returns "No Attestation" or "Not Provider+". If there is no such I, the AS_PATH consists only of "Provider+" pairs only, so the minimum up-ramp length equals to AS_PATH length, or N. We define this parameter as min_up_ramp.
       </t>
       <t>
-        The maximum up-ramp length can be defined as I, where I is the minimum index for which authorized(A(I), A(I+1)) returns 'Not Provider'. If there is no such I, the maximum is equal to AS_PATH length, or N. We define this parameter as max_up_ramp. The minimum up-ramp length can be defined as I, where I is minimum index for which authorized(A(I), A(I+1)) returns "No Attestation" or "Not Provider". If there is no such I, the AS_APATH consists only of "Provider+" pairs only, so the minimum up-ramp length equals to AS_PATH length, or N. We define this parameter as min_up_ramp.
-      </t>
-      <t>
-        Similar the maximum down-ramp length can be defined as N - J + 1 where J is maximum index for which authorized(A(J), A(J-1)) returns "Not Provider". If there is no such J, the maximum is equal to AS_PATH length, or N. We define this parameter as max_down_ramp. The minimum down-ramp length can be defined as N - J + 1 where J is maximum index for which authorized(A(J), A(J-1)) returns "No Attestation" or "Not Provider". If there is no such J, the minimum equals to AS_PATH length, or N. We define this parameter as min_down_ramp.
+        Similar the maximum down-ramp length can be defined as N - J + 1 where J is maximum index for which authorized(A(J), A(J-1)) returns "Not Provider+". If there is no such J, the maximum is equal to AS_PATH length, or N. We define this parameter as max_down_ramp. The minimum down-ramp length can be defined as N - J + 1 where J is maximum index for which authorized(A(J), A(J-1)) returns "No Attestation" or "Not Provider+". If there is no such J, the minimum equals to AS_PATH length, or N. We define this parameter as min_down_ramp.
       </t>
 
       <t>
@@ -391,7 +392,7 @@ authorized(AS x, AS y) =  / Else, "Provider+" if the VAP-SPAS entry
       <t>
         The upstream verification algorithm described here is applied when a route is received from a customer or lateral peer, or is received by an RS from an RS-client, or is received by an RS-client from an RS.
         In all these cases, the receiving/validating eBGP router expects the AS_PATH does not have a down-ramp, only up-ramp.
-        Thus max_down_ramp and min_up_ramp are set to 0.
+        Thus max_down_ramp and min_down_ramp are set to 0.
       </t>
       <t>
         The upstream path verification procedure is specified as follows:
@@ -435,7 +436,7 @@ authorized(AS x, AS y) =  / Else, "Provider+" if the VAP-SPAS entry
             If the sum of max_up_ramp and max_down_ramp is less than N the procedure halts with the outcome 'Invalid'.
           </t>
           <t>
-            If the sum of min_up_ramp and min_down_ramp is less than N the procedure halts with the outcome 'Unknown'.
+            If the sum of min_up_ramp and min_down_ramp is less than N, the procedure terminates with the result 'Unknown', otherwise 'Valid'.
           </t>
         </list>
       </t>
@@ -469,8 +470,8 @@ authorized(AS x, AS y) =  / Else, "Provider+" if the VAP-SPAS entry
 
     <section title="Implementation of Verification Algorithm">
       <t>
-	    Implementations of this specification are not required to implement the AS_PATH verification procedures exactly as described in Section XX but MUST provide functionality equivalent to the external behavior resulting from those procedures.
-	    Therefore, implementation may differ, for example, for computational efficiency purposes.
+	    Implementations of this specification are not required to implement the AS_PATH verification procedures exactly as described in Section <xref target="Upflow"/> and <xref target="Downflow"/>, but MUST provide functionality equivalent to the external behavior resulting from those procedures.
+      Therefore, implementation may differ, for example, for computational efficiency purposes. For a list of different reference implementations, see <xref target="NETD-TUD-REF-IMPL"/>.
       </t>
     </section>
 
@@ -481,7 +482,7 @@ authorized(AS x, AS y) =  / Else, "Provider+" if the VAP-SPAS entry
       </t>
 
       <t>
-        In case of Complex peering relations that can't be segregated in multiple eBGP sessions, an operator may want to achieve an equivalent outcome by configuring policies with corresponding verification procedures on a per-prefix basis.
+        In case of Complex peering relations that can not be segregated in multiple eBGP sessions, an operator may want to achieve an equivalent outcome by configuring policies with corresponding verification procedures on a per-prefix basis.
       </t>
     </section>
 
@@ -513,7 +514,7 @@ authorized(AS x, AS y) =  / Else, "Provider+" if the VAP-SPAS entry
     <section title="Make Before Break">
       <t>
         ASPA issuers SHOULD apply the make-before-break principle while updating an ASPA registration.
-		For example, when adding new Provider AS(es) in the SPAS, if the new ASPA is meant to replace a previously created ASPA, the latter SHOULD be decommissioned only after allowing sufficient time for the new ASPA to propagate to Relying Parties (RP) through the global RPKI system.
+		For example, when adding new Provider ASes in the SPAS, if the new ASPA is meant to replace a previously created ASPA, the latter SHOULD be decommissioned only after allowing sufficient time for the new ASPA to propagate to Relying Parties (RP) through the global RPKI system.
       </t>
     </section>
 
@@ -521,7 +522,7 @@ authorized(AS x, AS y) =  / Else, "Provider+" if the VAP-SPAS entry
       <t>
         An AS may have a mitigation service provider (MSP) for protection from Denial of Service (DoS)/Distributed DoS (DDoS) attacks targeting servers with IP addresses in the prefixes the AS originates.
         Such an AS MAY include the MSP's AS in the SPAS of its ASPA.
-        With such an ASPA in place, in the event of an attack, the AS (customer of the MSP) can announce more specific prefixes (over a BGP session) to the MSP's AS for mitigation purposes, and such announcements would be able to pass the ASPA-based path verification.
+        With such an ASPA in place, in the event of an attack, the AS (customer of the MSP) can announce more specific prefixes (over a BGP session) to the MSPs AS for mitigation purposes, and such announcements would be able to pass the ASPA-based path verification.
         It is assumed that appropriate ROAs are registered in advance so that the announcements can pass RPKI-ROV as well.
       </t>
     </section>
@@ -608,6 +609,9 @@ authorized(AS x, AS y) =  / Else, "Provider+" if the VAP-SPAS entry
           It includes unit test cases for testing the ASPA-based path verification.
           It was provided by Oliver Borchert, Kyehwan Lee, and their colleagues at US NIST.
           It requires some additional work to incorporate the latest changes in the draft specifications related to IXP RS AS and RS-client.
+        </li>
+        <li>
+          ASPA Support in <xref target="RTRLIB">RTRlib</xref> was written in C, by Moritz Schulz, Carl Seifert, and Tassilo Tanneberger.
         </li>
       </ul>
       </t>
@@ -711,15 +715,44 @@ authorized(AS x, AS y) =  / Else, "Provider+" if the VAP-SPAS entry
       </reference>
 
       <reference anchor="BGP-SRx" target="https://www.nist.gov/services-resources/software/bgp-secure-routing-extension-bgp-srx-software-suite">
-          <front>
-            <title>BGP Secure Routing Extension (BGP-SRx) Software Suite</title>
-            <author>
-              <organization>NIST</organization>
-            </author>
-          </front>
-          <seriesInfo name="NIST Open-Source Software" value=""  />
-        </reference>
+        <front>
+          <title>BGP Secure Routing Extension (BGP-SRx) Software Suite</title>
+          <author>
+            <organization>NIST</organization>
+          </author>
+        </front>
+        <seriesInfo name="NIST Open-Source Software" value=""  />
+      </reference>
 
+      <reference anchor="NETD-TUD-REF-IMPL" target="https://github.com/netd-tud/IETF-ASPA/">
+        <front>
+          <title>ASPA AS_PATH Validation Reference Implementation</title>
+          <author fullname="Tassilo Tanneberger" initials="T." surname="Tanneberger">
+            <organization>TUD Dresden University of Technology</organization>
+          </author>
+          <author fullname="Moritz Schulz" initials="M." surname="Schulz">
+            <organization>TUD Dresden University of Technology</organization>
+          </author>
+          <author fullname="Carl Seifert" initials="C." surname="Seifert">
+            <organization>TUD Dresden University of Technology</organization>
+          </author>
+        </front>
+      </reference>
+
+      <reference anchor="RTRLIB" target="https://github.com/rtrlib/rtrlib">
+        <front>
+          <title>ASPA Support in RTRlib</title>
+          <author fullname="Tassilo Tanneberger" initials="T." surname="Tanneberger">
+            <organization>TUD Dresden University of Technology</organization>
+          </author>
+          <author fullname="Moritz Schulz" initials="M." surname="Schulz">
+            <organization>TUD Dresden University of Technology</organization>
+          </author>
+          <author fullname="Carl Seifert" initials="C." surname="Seifert">
+            <organization>TUD Dresden University of Technology</organization>
+          </author>
+        </front>
+      </reference>
     </references>
 	
     <section anchor="Acknowledgments" title="Acknowledgments">
