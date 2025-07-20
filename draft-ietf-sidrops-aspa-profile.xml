@@ -354,6 +354,10 @@
           A validator implementation <xref target="rpki-client"/> (version 8.5 and higher), written in C was provided by Job Snijders.
         </li>
         <li>
+          A validator implementation <xref target="RTRlib"/> (version 21), written in C was provided by Tassilo Tanneberger, Carl Seifer, Moritz Schulz, Matthias Braeuer supervised by Thomas Schmidt and Matthias Waehlisch and reviewed by Fabian Holler.
+
+        </li>
+        <li>
           A validator implementation <xref target="routinator"/>, written in Rust was provided by Martin Hoffman from NLnet Labs.
         </li>
         <li>
@@ -448,6 +452,19 @@
           <author fullname="Kristaps Dzonsons"/>
           <author fullname="Theo Buehler"/>
           <date year="2023" />
+        </front>
+      </reference>
+
+      <reference anchor="RTRlib" target= "https://rtrlib.realmv6.org/">
+        <front>
+          <title> RTRlib. The RPKI RTR Client C Library. </title>
+          <author initials="M." surname="Braeuer"><organization /></author>
+          <author initials="F." surname="Holler"><organization /></author>
+          <author initials="C." surname="Seifert"><organization /></author>
+          <author initials="T." surname="Schmidt"><organization /></author>
+          <author initials="M." surname="Schulz"><organization /></author>
+          <author initials="T." surname="Tanneberger"><organization /></author>
+          <author initials="M." surname="Waehlisch"><organization /></author>
         </front>
       </reference>
 

@@ -586,6 +586,9 @@ authorized(AS x, AS y) =   / Else, "Provider+" if the U-SPAS entry
             A BGP implementation <xref target="bgpd">OpenBGPD</xref> (version 7.8 and higher), written in C, was provided by Claudio Jeker, Theo Buehler, and Job Snijders.
           </li>
           <li>
+            <xref target="RTRlib">RTRLib provides an implementation of version 22 in C. The implementation was created by Tassilo Tanneberger, Carl Seifer, Moritz Schulz, Matthias Braeuer supervised by Thomas Schmidt and Matthias Waehlisch and reviewed by Fabian Holler.
+          </li>
+          <li>
             The implementation NIST-BGP-SRx <xref target="BGP-SRx"/> is a software suite that provides a validation engine (BGP-SRx) and a Quagga-based BGP router (Quagga-SRx).
             It includes unit test cases for testing the ASPA-based path verification.
             It was provided by Oliver Borchert, Kyehwan Lee, and their colleagues at US NIST.
@@ -670,17 +673,15 @@ authorized(AS x, AS y) =   / Else, "Provider+" if the U-SPAS entry
         </front>
         <seriesInfo name="NANOG-89, North American Network Operator Group Meeting," value="Slides/video archives from NANOG" />
       </reference>
-
       <reference anchor="aspa-examples" target="https://github.com/ksriram25/IETF/blob/main/ASPA_path_verification_examples.pdf">
         <front>
           <title>ASPA-based AS Path Verification Examples</title>
-            <author initials="" surname="">
-              <organization></organization>
-            </author>
-            <date/>
-          </front>
-        </reference>
-
+          <author initials="" surname="">
+            <organization></organization>
+          </author>
+          <date/>
+        </front>
+      </reference>
       <reference anchor="IANA-AF" target="https://www.iana.org/assignments/address-family-numbers/address-family-numbers.xhtml" quote-title="true">
         <front>
           <title>Address Family Numbers</title>
@@ -689,52 +690,61 @@ authorized(AS x, AS y) =   / Else, "Provider+" if the U-SPAS entry
           </author>
           <date/>
         </front>
-        <!-- <seriesInfo name="Reachable from" value="http://www.iana.org/numbers.html"/> -->
+      <!-- <seriesInfo name="Reachable from" value="http://www.iana.org/numbers.html"/> -->
       </reference>
-
-        <reference anchor="IANA-SAF" target="https://www.iana.org/assignments/safi-namespace/safi-namespace.xhtml" quote-title="true">
-          <front>
-            <title>Subsequent Address Family Identifiers (SAFI) Parameters</title>
-            <author>
-              <organization>IANA</organization>
-            </author>
-            <date/>
-          </front>
-        <!-- <seriesInfo name="Reachable from" value="http://www.iana.org/numbers.html"/> -->
-        </reference>
-
-        <reference anchor="bgpd" target="http://www.openbgpd.org/">
-          <front>
-            <title>OpenBGPD</title>
-            <author initials="C." surname="Jeker">
-              <organization>OpenBSD</organization>
-            </author>
-            <date/>
-          </front>
-        </reference>
-
-        <reference anchor="BGP-SRx" target="https://www.nist.gov/services-resources/software/bgp-secure-routing-extension-bgp-srx-software-suite">
-          <front>
-            <title>BGP Secure Routing Extension (BGP-SRx) Software Suite</title>
-            <author initials="K." surname="Lee"><organization /></author>
-            <author initials="O." surname="Borchert, et al."><organization /></author>
-          </front>
-          <seriesInfo name="NIST Open-Source Software" value=""  />
-        </reference>
-        <reference anchor="BIRD" target= "https://bird.nic.cz/en/">
-          <front>
-            <title>BIRD Internet Routing Daemon; branch mq-aspa </title>
-            <author initials="K." surname="Kubecova"><organization /></author>
-            <author initials="M." surname="Matejka"><organization /></author>
-          </front>
-          <seriesInfo name="CZ.NIC BIRD Open-Source Software" value=""  />
-        </reference>
-        <reference anchor="FreeRTR" target= "http://www.freertr.org/">
-          <front>
-            <title>FreeRTR </title>
-            <author initials="C." surname="Mate"><organization /></author>
-          </front>
-        </reference>
+      <reference anchor="IANA-SAF" target="https://www.iana.org/assignments/safi-namespace/safi-namespace.xhtml" quote-title="true">
+        <front>
+          <title>Subsequent Address Family Identifiers (SAFI) Parameters</title>
+          <author>
+            <organization>IANA</organization>
+          </author>
+          <date/>
+        </front>
+      <!-- <seriesInfo name="Reachable from" value="http://www.iana.org/numbers.html"/> -->
+      </reference>
+      <reference anchor="bgpd" target="http://www.openbgpd.org/">
+        <front>
+          <title>OpenBGPD</title>
+          <author initials="C." surname="Jeker">
+            <organization>OpenBSD</organization>
+          </author>
+          <date/>
+        </front>
+      </reference>
+      <reference anchor="BGP-SRx" target="https://www.nist.gov/services-resources/software/bgp-secure-routing-extension-bgp-srx-software-suite">
+        <front>
+          <title>BGP Secure Routing Extension (BGP-SRx) Software Suite</title>
+          <author initials="K." surname="Lee"><organization /></author>
+          <author initials="O." surname="Borchert, et al."><organization /></author>
+        </front>
+        <seriesInfo name="NIST Open-Source Software" value=""  />
+      </reference>
+      <reference anchor="RTRlib" target= "https://rtrlib.realmv6.org/">
+        <front>
+          <title> RTRlib. The RPKI RTR Client C Library. </title>
+          <author initials="M." surname="Braeuer"><organization /></author>
+          <author initials="F." surname="Holler"><organization /></author>
+          <author initials="C." surname="Seifert"><organization /></author>
+          <author initials="T." surname="Schmidt"><organization /></author>
+          <author initials="M." surname="Schulz"><organization /></author>
+          <author initials="T." surname="Tanneberger"><organization /></author>
+          <author initials="M." surname="Waehlisch"><organization /></author>
+        </front>
+      </reference>
+      <reference anchor="BIRD" target= "https://bird.nic.cz/en/">
+        <front>
+          <title>BIRD Internet Routing Daemon; branch mq-aspa </title>
+          <author initials="K." surname="Kubecova"><organization /></author>
+          <author initials="M." surname="Matejka"><organization /></author>
+        </front>
+        <seriesInfo name="CZ.NIC BIRD Open-Source Software" value=""  />
+      </reference>
+      <reference anchor="FreeRTR" target= "http://www.freertr.org/">
+        <front>
+          <title>FreeRTR </title>
+          <author initials="C." surname="Mate"><organization /></author>
+        </front>
+      </reference>
     </references>
 
     <section anchor="Acknowledgments" title="Acknowledgments">
